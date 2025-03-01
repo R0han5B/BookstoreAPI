@@ -8,7 +8,7 @@ const PORT = 3000;
 
 app.use(bodyParser.json());
 
-// Updated book data
+// book data
 let books = [
   { isbn: "9781491952023", title: "JavaScript: The Definitive Guide", author: "David Flanagan", reviews: [] },
   { isbn: "9781491924464", title: "You Don't Know JS: Up & Going", author: "Kyle Simpson", reviews: [] },
