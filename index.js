@@ -7,6 +7,7 @@ const PORT = 3000;
 
 app.use(bodyParser.json());
 
+// Updated book data with 2 reviews removed
 let books = [
   { isbn: "9781491952023", title: "JavaScript: The Definitive Guide", author: "David Flanagan", reviews: ["Excellent reference book!"] },
   { isbn: "9781491924464", title: "You Don't Know JS: Up & Going", author: "Kyle Simpson", reviews: ["Great for deep understanding!"] },
@@ -23,6 +24,7 @@ let books = [
 let users = [];
 const SECRET_KEY = "mysecretkey";
 
+// Middleware to verify JWT token
 const verifyToken = (req, res, next) => {
   const token = req.headers["authorization"];
   if (!token) return res.status(403).json({ message: "Token required" });
@@ -33,7 +35,82 @@ const verifyToken = (req, res, next) => {
   });
 };
 
-// Add/Modify Book Review 
+// Task 1: Get all books
+app.get("/books", async (req, res) => {
+  try {
+    const allBooks = await getAllBooks();
+    res.json(allBooks);
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching books" });
+  }
+});
+
+// Task 2: Get books by ISBN
+app.get("/books/isbn/:isbn", async (req, res) => {
+  try {
+    const book = await getBookByISBN(req.params.isbn);
+    res.json(book);
+  } catch (error) {
+    res.status(404).json({ message: error });
+  }
+});
+
+// Task 3: Get books by Author
+app.get("/books/author/:author", async (req, res) => {
+  try {
+    const booksByAuthor = await getBooksByAuthor(req.params.author);
+    booksByAuthor.length
+      ? res.json(booksByAuthor)
+      : res.status(404).json({ message: "No books found" });
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching books by author" });
+  }
+});
+
+// Task 4: Get books by Title
+app.get("/books/title/:title", async (req, res) => {
+  try {
+    const booksByTitle = await getBooksByTitle(req.params.title);
+    booksByTitle.length
+      ? res.json(booksByTitle)
+      : res.status(404).json({ message: "No books found" });
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching books by title" });
+  }
+});
+
+// Task 5: Get book reviews
+app.get("/books/isbn/:isbn/reviews", (req, res) => {
+  const book = books.find((b) => b.isbn === req.params.isbn);
+  book
+    ? res.json(book.reviews)
+    : res.status(404).json({ message: "Book not found" });
+});
+
+// Task 6: Register New User
+app.post("/register", (req, res) => {
+  const { username, password } = req.body;
+  if (users.find((user) => user.username === username)) {
+    return res.status(400).json({ message: "User already exists" });
+  }
+  users.push({ username, password });
+  res.json({ message: "User registered successfully" });
+});
+
+// Task 7: Login as Registered User
+app.post("/login", (req, res) => {
+  const { username, password } = req.body;
+  const user = users.find(
+    (u) => u.username === username && u.password === password
+  );
+  if (!user) {
+    return res.status(401).json({ message: "Invalid credentials" });
+  }
+  const token = jwt.sign({ username }, SECRET_KEY, { expiresIn: "1h" });
+  res.json({ token });
+});
+
+// Task 8: Add a Review (Allow up to 3 reviews per user per book)
 app.post("/books/isbn/:isbn/review", verifyToken, (req, res) => {
   const { review } = req.body;
   const book = books.find((b) => b.isbn === req.params.isbn);
@@ -50,7 +127,7 @@ app.post("/books/isbn/:isbn/review", verifyToken, (req, res) => {
   res.json({ message: "Review added." });
 });
 
-// Modify a specific review
+// Task 9: Modify a Review
 app.put("/books/isbn/:isbn/review/:index", verifyToken, (req, res) => {
   const { review } = req.body;
   const book = books.find((b) => b.isbn === req.params.isbn);
@@ -69,7 +146,7 @@ app.put("/books/isbn/:isbn/review/:index", verifyToken, (req, res) => {
   res.json({ message: "Review updated." });
 });
 
-// Delete a specific review
+// Task 10: Delete a Review
 app.delete("/books/isbn/:isbn/review/:index", verifyToken, (req, res) => {
   const book = books.find((b) => b.isbn === req.params.isbn);
   if (!book) return res.status(404).json({ message: "Book not found" });
@@ -87,6 +164,16 @@ app.delete("/books/isbn/:isbn/review/:index", verifyToken, (req, res) => {
   res.json({ message: "Review deleted." });
 });
 
+// Async functions
+const getAllBooks = async () => new Promise((resolve) => setTimeout(() => resolve(books), 1000));
+const getBookByISBN = (isbn) => new Promise((resolve, reject) => {
+  const book = books.find((b) => b.isbn === isbn);
+  book ? resolve(book) : reject("Book not found");
+});
+const getBooksByAuthor = async (author) => books.filter((b) => b.author === author);
+const getBooksByTitle = async (title) => books.filter((b) => b.title === title);
+
+// Start the server
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
