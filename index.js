@@ -10,16 +10,16 @@ app.use(bodyParser.json());
 
 // book data
 let books = [
-  { isbn: "9781491952023", title: "JavaScript: The Definitive Guide", author: "David Flanagan", reviews: [] },
-  { isbn: "9781491924464", title: "You Don't Know JS: Up & Going", author: "Kyle Simpson", reviews: [] },
-  { isbn: "9781593279509", title: "Eloquent JavaScript", author: "Marijn Haverbeke", reviews: [] },
-  { isbn: "9780596517748", title: "JavaScript: The Good Parts", author: "Douglas Crockford", reviews: [] },
-  { isbn: "9781933988696", title: "Secrets of the JavaScript Ninja", author: "John Resig", reviews: [] },
-  { isbn: "9781449340131", title: "Head First JavaScript Programming", author: "Eric Freeman", reviews: [] },
-  { isbn: "9781449331818", title: "Learning JavaScript Design Patterns", author: "Addy Osmani", reviews: [] },
-  { isbn: "9780321812186", title: "Effective JavaScript", author: "David Herman", reviews: [] },
-  { isbn: "9781491950296", title: "Programming JavaScript Applications", author: "Eric Elliott", reviews: [] },
-  { isbn: "9781497408180", title: "A Smarter Way to Learn JavaScript", author: "Mark Myers", reviews: [] }
+  { isbn: "9781491952023", title: "JavaScript: The Definitive Guide", author: "David Flanagan", reviews: ["Excellent reference book"] },
+  { isbn: "9781491924464", title: "You Don't Know JS: Up & Going", author: "Kyle Simpson", reviews: ["Great for deep understanding"] },
+  { isbn: "9781593279509", title: "Eloquent JavaScript", author: "Marijn Haverbeke", reviews: ["Well-written and beginner-friendly"] },
+  { isbn: "9780596517748", title: "JavaScript: The Good Parts", author: "Douglas Crockford", reviews: ["A classic must-read"] },
+  { isbn: "9781933988696", title: "Secrets of the JavaScript Ninja", author: "John Resig", reviews: ["Great for advanced users"] },
+  { isbn: "9781449340131", title: "Head First JavaScript Programming", author: "Eric Freeman", reviews: ["Fun and engaging"] },
+  { isbn: "9781449331818", title: "Learning JavaScript Design Patterns", author: "Addy Osmani", reviews: ["Great for structuring code"] },
+  { isbn: "9780321812186", title: "Effective JavaScript", author: "David Herman", reviews: ["Very insightful"] },
+  { isbn: "9781491950296", title: "Programming JavaScript Applications", author: "Eric Elliott", reviews: ["Practical and useful"] },
+  { isbn: "9781497408180", title: "A Smarter Way to Learn JavaScript", author: "Mark Myers", reviews: ["Best for beginners"] }
 ];
 
 let users = [];
@@ -121,10 +121,8 @@ app.post("/books/isbn/:isbn/review", verifyToken, (req, res) => {
   );
 
   if (existingReviewIndex !== -1) {
-    // Modify existing review
     book.reviews[existingReviewIndex].review = req.body.review;
   } else {
-    // Add new review
     book.reviews.push({ username: req.user.username, review: req.body.review });
   }
 
@@ -139,31 +137,6 @@ app.delete("/books/isbn/:isbn/review", verifyToken, (req, res) => {
   book.reviews = book.reviews.filter((r) => r.username !== req.user.username);
   res.json({ message: "Review deleted" });
 });
-
-// Task 10: Get all books using async callback function
-const getAllBooks = async () => {
-  return new Promise((resolve) => {
-    setTimeout(() => resolve(books), 1000);
-  });
-};
-
-// Task 11: Search by ISBN using Promises
-const getBookByISBN = (isbn) => {
-  return new Promise((resolve, reject) => {
-    const book = books.find((b) => b.isbn === isbn);
-    book ? resolve(book) : reject("Book not found");
-  });
-};
-
-// Task 12: Search by Author using Async/Await
-const getBooksByAuthor = async (author) => {
-  return books.filter((b) => b.author === author);
-};
-
-// Task 13: Search by Title using Async/Await
-const getBooksByTitle = async (title) => {
-  return books.filter((b) => b.title === title);
-};
 
 // Start the server
 app.listen(PORT, () => {
