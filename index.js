@@ -10,16 +10,16 @@ app.use(bodyParser.json());
 
 // book data
 let books = [
-  { isbn: "9781491952023", title: "JavaScript: The Definitive Guide", author: "David Flanagan", reviews: ["Excellent reference book"] },
-  { isbn: "9781491924464", title: "You Don't Know JS: Up & Going", author: "Kyle Simpson", reviews: ["Great for deep understanding"] },
-  { isbn: "9781593279509", title: "Eloquent JavaScript", author: "Marijn Haverbeke", reviews: ["Well-written and beginner-friendly"] },
-  { isbn: "9780596517748", title: "JavaScript: The Good Parts", author: "Douglas Crockford", reviews: ["A classic must-read"] },
-  { isbn: "9781933988696", title: "Secrets of the JavaScript Ninja", author: "John Resig", reviews: ["Great for advanced users"] },
-  { isbn: "9781449340131", title: "Head First JavaScript Programming", author: "Eric Freeman", reviews: ["Fun and engaging"] },
-  { isbn: "9781449331818", title: "Learning JavaScript Design Patterns", author: "Addy Osmani", reviews: ["Great for structuring code"] },
-  { isbn: "9780321812186", title: "Effective JavaScript", author: "David Herman", reviews: ["Very insightful"] },
-  { isbn: "9781491950296", title: "Programming JavaScript Applications", author: "Eric Elliott", reviews: ["Practical and useful"] },
-  { isbn: "9781497408180", title: "A Smarter Way to Learn JavaScript", author: "Mark Myers", reviews: ["Best for beginners"] }
+  { isbn: "9781491952023", title: "JavaScript: The Definitive Guide", author: "David Flanagan", reviews: ["Excellent reference book!"] },
+  { isbn: "9781491924464", title: "You Don't Know JS: Up & Going", author: "Kyle Simpson", reviews: ["Great for deep understanding!"] },
+  { isbn: "9781593279509", title: "Eloquent JavaScript", author: "Marijn Haverbeke", reviews: ["Very well written and insightful!"] },
+  { isbn: "9780596517748", title: "JavaScript: The Good Parts", author: "Douglas Crockford", reviews: ["A must-read for JavaScript developers!"] },
+  { isbn: "9781933988696", title: "Secrets of the JavaScript Ninja", author: "John Resig", reviews: ["Perfect for advanced JavaScript users!"] },
+  { isbn: "9781449340131", title: "Head First JavaScript Programming", author: "Eric Freeman", reviews: ["Great for beginners and interactive learning!"] },
+  { isbn: "9781449331818", title: "Learning JavaScript Design Patterns", author: "Addy Osmani", reviews: ["Comprehensive and practical!"] },
+  { isbn: "9780321812186", title: "Effective JavaScript", author: "David Herman", reviews: ["Packed with useful tips!"] },
+  { isbn: "9781491950296", title: "Programming JavaScript Applications", author: "Eric Elliott", reviews: ["Very informative and practical!"] },
+  { isbn: "9781497408180", title: "A Smarter Way to Learn JavaScript", author: "Mark Myers", reviews: ["Perfect for self-paced learning!"] }
 ];
 
 let users = [];
@@ -137,6 +137,15 @@ app.delete("/books/isbn/:isbn/review", verifyToken, (req, res) => {
   book.reviews = book.reviews.filter((r) => r.username !== req.user.username);
   res.json({ message: "Review deleted" });
 });
+
+// Async functions
+const getAllBooks = async () => new Promise((resolve) => setTimeout(() => resolve(books), 1000));
+const getBookByISBN = (isbn) => new Promise((resolve, reject) => {
+  const book = books.find((b) => b.isbn === isbn);
+  book ? resolve(book) : reject("Book not found");
+});
+const getBooksByAuthor = async (author) => books.filter((b) => b.author === author);
+const getBooksByTitle = async (title) => books.filter((b) => b.title === title);
 
 // Start the server
 app.listen(PORT, () => {
